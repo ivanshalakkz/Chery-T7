@@ -1,14 +1,7 @@
+
 name: Release
-
-# Единая сборка приложения: тег v* запускает юнит-тесты, собирает подписанный
-# релизный APK и публикует GitHub Release. Тег — vX.Y.Z, равный versionName
-# из app/build.gradle.kts. Суффикс -dev у тега (например v1.8.1-dev)
-# остаётся допустимым и публикуется как prerelease. Подпись —
-# debug-ключом из keystore/debug.keystore (см. app/build.gradle.kts),
-# поэтому локальная и CI-сборки взаимозаменяемы и обновляются поверх
-# установленной.
-
 on:
+  workflow_dispatch:
   push:
     tags:
       - 'v*'
