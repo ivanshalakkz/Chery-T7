@@ -162,31 +162,24 @@ object CarLanClient {
         }
     }
 
-    private fun write(c: IBinder, type: Int, subtype: Int, json: String) {
-        val data = Parcel.obtain()
-        val reply = Parcel.obtain()
-        try {
-            data.writeInterfaceToken(ICOMMON)
-            data.writeInt(type)
-            data.writeInt(1)
-            data.writeInt(subtype)
-            data.writeString(json)
-            data.writeInt(-1977)
-            c.transact(TX_WRITE_MESSAGE, data, reply, 0)
-            reply.readException()
-            note("-> $type/$subtype $json = ${reply.readInt()}")
-        } catch (e: Exception) {
-            note("-> $type/$subtype ошибка ${e.javaClass.simpleName}: ${e.message}")
-            if (!c.isBinderAlive) {
-                common = null
-                pending[type to subtype] = json
-            }
-        } finally {
-            data.recycle()
-            reply.recycle()
-        }
+    private fun write(service: android.os.IBinder, type: Int, subtype: Int, json: String) {
+    val ctx = app ?: return
+    try {
+        val intent = android.content.Intent("com.desay_sv.cluster.music.action")
+        intent.setPackage("com.desay_sv.mutiscreen")
+        intent.putExtra("cluster_cmd", 0x3ea)
+        
+        val bundle = android.os.Bundle()
+        bundle.putString("state", json)
+        intent.putExtra("cluster_bundle", bundle)
+        
+        intent.putExtra("sender", "com.dash.headunit")
+        ctx.sendBroadcast(intent)
+        note("Sent broadcast to mutiscreen")
+    } catch (e: Exception) {
+        note("Broadcast error: ${e.message}")
     }
-
+    }
     private fun connect(ctx: Context) {
         if (bound) return
         val intent = Intent(ACTION).setPackage(PACKAGE)
